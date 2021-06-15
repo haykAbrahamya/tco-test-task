@@ -23,7 +23,7 @@ export const Dropzone = ({
     >
       {
         ({
-          error,
+          errors,
           isDragActive,
           isDragReject,
           fileRejections,
@@ -41,6 +41,15 @@ export const Dropzone = ({
             >
               <input {...getInputProps()}/>
               {
+                !!fileRejections.length &&
+                  <S.ErrorMessage>
+                    { fileRejections[0].errors[0].code === 'file-too-large'
+                        ? 'File is larger than 5mb'
+                        : fileRejections[0].errors[0].message
+                    }
+                  </S.ErrorMessage>
+              }
+              {
                 !images.length
                   ? <S.EmptyDropzoneContainer>
                       <S.UploadIconContainer>
@@ -50,44 +59,33 @@ export const Dropzone = ({
                         <span>Choose a file</span> to upload or drag it here<br />(jpg, png, max size 5mb)
                       </S.UploadText>
                     </S.EmptyDropzoneContainer>
-                  : <S.ImagesListContainer>
+                  : <S.ImagesList>
                       {
-                        !!fileRejections.length &&
-                          <S.ErrorMessage>
-                            { fileRejections[0].errors[0].code === 'file-too-large'
-                                ? 'File is larger than 5mb'
-                                : fileRejections[0].errors[0].message
-                            }
-                          </S.ErrorMessage>
-                      }
-                      <S.ImagesList>
-                        {
-                          images.map(image => (
-                            <S.ImageContainer
-                              key={image.id}
-                              onClick={e => e.stopPropagation()}
+                        images.map(image => (
+                          <S.ImageContainer
+                            key={image.id}
+                            onClick={e => e.stopPropagation()}
+                          >
+                            <S.RemoveIconContainer
+                              onClick={e => {
+                                e.stopPropagation()
+                                onRemove(image)
+                              }}
                             >
-                              <S.RemoveIconContainer
-                                onClick={e => {
-                                  e.stopPropagation()
-                                  onRemove(image)
-                                }}
-                              >
-                                <img
-                                  src={removeIcon}
-                                  alt='remove-icon'
-                                />
-                              </S.RemoveIconContainer>
                               <img
-                                src={image.preview}
-                                alt='preview'
-                                className='image-preview'
+                                src={removeIcon}
+                                alt='remove-icon'
                               />
-                            </S.ImageContainer>
-                          ))  
-                        }
-                      </S.ImagesList>
-                    </S.ImagesListContainer>
+                            </S.RemoveIconContainer>
+                            <img
+                              src={image.preview}
+                              alt='preview'
+                              className='image-preview'
+                            />
+                          </S.ImageContainer>
+                        ))  
+                      }
+                    </S.ImagesList>
               }
             </S.DropzoneContainer>     
           )
